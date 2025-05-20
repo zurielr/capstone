@@ -26,6 +26,19 @@ let checkSession = ()=>{
 </script>
 </head>
 <body onload="checkSession()">
+    {% if user.is_authenticated %}
+        <p>Username: {{ user.username }}, First name: {{ user.first_name }}, Last name: {{ user.last_name }}</p>
+    {% endif %}
+    {% if user.is_authenticated %}
+        <div class="rightalign">
+            <div class="dropdown">
+                <button class="dropbtn">{{ user.first_name }}</button>
+                <div class="dropdown-content">
+                    <a href="{% url 'djangoapp:logout_request' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color:darkturquoise; height: 1in;">
   <div class="container-fluid">
     <h2 style="padding-right: 5%;">Dealerships</h2>
