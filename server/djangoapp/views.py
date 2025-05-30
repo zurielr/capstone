@@ -8,7 +8,7 @@ from .models import CarMake, CarModel
 from .populate import initiate
 import logging
 import json
-
+from .restapis import get_request, analyze_review_sentiments, post_review
 # from django.http import HttpResponseRedirect, HttpResponse
 # from django.contrib import messages
 # from datetime import datetime
@@ -119,7 +119,27 @@ def get_cars(request):
     return JsonResponse({"CarModels":cars})
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 # def get_dealer_reviews(request,dealer_id):
-# ...
+def get_dealer_reviews(request, dealer_id):
+    # Fetch reviews for the dealer
+    reviews = get_request(f"/fetchReviews/dealer/{dealer_id}")
+    review_details = []
+    if reviews:
+        for review in reviews:
+            sentiment = analyze_review_sentiments(review.get("review", ""))
+            review_detail = {
+                "id": review.get("id"),
+                "name": review.get("name"),
+                "dealership": review.get("dealership"),
+                "review": review.get("review"),
+                "purchase": review.get("purchase"),
+                "purchase_date": review.get("purchase_date"),
+                "car_make": review.get("car_make"),
+                "car_model": review.get("car_model"),
+                "car_year": review.get("car_year"),
+                "sentiment": sentiment
+            }
+            review_details.append(review_detail)
+    return JsonResponse(review_details, safe=False)
 
 # Create a `get_dealer_details` view to render the dealer details
 # def get_dealer_details(request, dealer_id):
@@ -127,4 +147,13 @@ def get_cars(request):
 
 # Create a `add_review` view to submit a review
 # def add_review(request):
-# ...
+def add_review(request):
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
+        try:
+            response = post_review(data)
+            return JsonResponse({"status":200})
+        except:
+            return JsonResponse({"status":401,"message":"Error in posting review"})
+    else:
+        return JsonResponse({"status":403,"message":"Unauthorized"})
