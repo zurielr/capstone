@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Dealership App{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="{% static 'Dealers.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'nav_bar.css' %}">
+    </head>
+    <body>
+
+
+        <header>
+            <div class="nav_container">
+                <nav>
+
+
+                    <ul>
+                        {% if user.is_authenticated %}
+                        <li><span>Welcome, {{ user.first_name }} {{ user.last_name }}!</span></li>
+                        <li><a href="{% url 'djangoapp:index' %}">Home</a></li>
+                        <li><a href="{% url 'djangoapp:index' %}">Dealerships</a></li>
+                        <li><a href="{% url 'djangoapp:logout' %}">Logout</a></li>
+                        {% else %}
+                        <li><a href="{% url 'djangoapp:login_user' %}">Login</a></li>
+                        <li><a href="{% url 'djangoapp:register_user' %}">Register</a></li>
+                        {% endif %}
+
+                    </ul>
+                
+                
+                </nav>
+
+
+
+                    <h1 class="logo">Welcome to our Dealerships!</h1>
+                
+                
+
+            </div>
+        </header>
+
+
+
+
+        <main>
+            {% block content %}<!-- Page content will be injected here -->{% endblock %}
+        </main>
+    </body>
+    <footer>
+        <div>
+            <nav class="nav_container">
+                
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </nav>
+            <p class="logo">2023 Dealership App. All rights reserved.</p>
+        </div>
+    </footer>
+</html>

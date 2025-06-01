@@ -4,16 +4,15 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import CarMake, CarModel
+from .models import CarMake, CarModel, Dealer, Review
 from .populate import initiate
+from .forms import ReviewForm
 import logging
 import json
 from .restapis import get_request, analyze_review_sentiments, post_review
 # from django.http import HttpResponseRedirect, HttpResponse
 # from django.contrib import messages
 # from datetime import datetime
-
-
 
 
 # Get an instance of a logger
@@ -24,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 def home(request):
     return render(request, "Home.html")
+
+
+def index(request):
+    return render(request, 'index.html')
 
 # ...existing code...
 # Create a `login_request` view to handle sign in request
@@ -105,7 +108,13 @@ def register_user(request):
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
 # def get_dealerships(request):
-# ...
+def get_dealerships(request):
+    # Fetch dealerships from the API
+    dealerships = get_request("/fetchDealerships")
+    if dealerships:
+        return JsonResponse(dealerships, safe=False)
+    else:
+        return JsonResponse({"error": "No dealerships found"}, status=404)
 
 def get_cars(request):
     count = CarMake.objects.filter().count()
@@ -143,7 +152,24 @@ def get_dealer_reviews(request, dealer_id):
 
 # Create a `get_dealer_details` view to render the dealer details
 # def get_dealer_details(request, dealer_id):
-# ...
+
+
+def dealer_detail(request, dealer_id):
+    dealer = get_object_or_404(Dealer, id=dealer_id)
+    reviews = Review.objects.filter(dealer=dealer)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.dealer = dealer
+            review.name = request.user.username  # Assuming a logged-in user
+            review.save()
+            return redirect("dealer_detail", dealer_id=dealer.id)
+    else:
+        form = ReviewForm()
+
+    return render(request, "dealer_detail.html", {"dealer": dealer, "reviews": reviews, "form": form})
 
 # Create a `add_review` view to submit a review
 # def add_review(request):
@@ -157,3 +183,35 @@ def add_review(request):
             return JsonResponse({"status":401,"message":"Error in posting review"})
     else:
         return JsonResponse({"status":403,"message":"Unauthorized"})
+
+
+
+def post_review(request, dealer_id):
+    dealer = get_object_or_404(Dealer, pk=dealer_id)
+    # If you have a CarModel model, fetch car models for the dropdown
+    car_models = []  # Replace with CarModel.objects.all() if available
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            # Save the review (implement your Review model accordingly)
+            # Example:
+            # Review.objects.create(
+            #     name=request.user.get_full_name() or request.user.username,
+            #     dealership=dealer,
+            #     review=form.cleaned_data['review'],
+            #     purchase=True,
+            #     purchase_date=form.cleaned_data['purchase_date'],
+            #     car_make=form.cleaned_data['car_make'],
+            #     car_model=form.cleaned_data['car_model'],
+            #     car_year=form.cleaned_data['car_year'],
+            # )
+            return redirect('djangoapp:dealer_detail', dealer_id=dealer.id)
+    else:
+        form = ReviewForm()
+
+    return render(request, "post_review.html", {
+        "dealer": dealer,
+        "form": form,
+        "car_models": car_models,
+    })

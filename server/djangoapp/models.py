@@ -1,5 +1,4 @@
 # Uncomment the following imports before adding the Model code
-
 from django.db import models
 # from django.utils.timezone import now
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -36,3 +35,27 @@ class CarModel(models.Model):
 
     def __str__(self):
         return f"{self.car_make.name} {self.name}"
+
+
+class Dealer(models.Model):
+    full_name = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
+    address = models.CharField(max_length=200)
+    zip = models.CharField(max_length=20)
+    state = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.full_name
+
+class Review(models.Model):
+    car = models.ForeignKey(CarModel, on_delete=models.CASCADE)  # Many-to-One relationship
+    dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE)  # Many-to-One relationship
+    name = models.CharField(max_length=100)
+    review = models.TextField()
+    purchase = models.BooleanField(default=False)
+    purchase_date = models.DateField(null=True, blank=True)
+    sentiment = models.CharField(max_length=20, default='neutral')  # Sentiment analysis result
+
+    def __str__(self):
+        return f"Review by {self.name} for {self.car.name}"
+

@@ -28,5 +28,6 @@ urlpatterns = [
     path('contact/', TemplateView.as_view(template_name="Contact.html")),
     path('logout/', views.logout_request, name='logout_request'),
     path('login/', views.login_user, name='login_user'),
-    path('register/', views.register_user, name='register_user'),  # if you have registration
+    path('register/', views.register_user, name='register_user'),
+    path('dealers/', TemplateView.as_view(template_name="index.html")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
