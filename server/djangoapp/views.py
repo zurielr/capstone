@@ -108,13 +108,20 @@ def register_user(request):
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
 # def get_dealerships(request):
-def get_dealerships(request):
-    # Fetch dealerships from the API
-    dealerships = get_request("/fetchDealerships")
-    if dealerships:
-        return JsonResponse(dealerships, safe=False)
-    else:
-        return JsonResponse({"error": "No dealerships found"}, status=404)
+def dealers(request):
+    # Fetch all dealers from DB
+    dealers_list = Dealer.objects.all()
+    states = dealers_list.values_list('state', flat=True).distinct()
+    selected_state = request.GET.get('state')
+    if selected_state and selected_state != "All":
+        dealers_list = dealers_list.filter(state=selected_state)
+    is_logged_in = request.user.is_authenticated
+    return render(request, 'dealers.html', {
+        'dealers_list': dealers_list,
+        'states': states,
+        'selected_state': selected_state,
+        'is_logged_in': is_logged_in,
+    })
 
 def get_cars(request):
     count = CarMake.objects.filter().count()

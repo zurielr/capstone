@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 from . import views
-from .views import dealer_detail, index, logout_request
+from .views import dealer_detail, index, logout_request, dealers
 
 app_name = 'djangoapp'
 urlpatterns = [
@@ -21,7 +21,7 @@ urlpatterns = [
     # path(route='login', view=views.login_user, name='login'),
     path('login/', views.login_user, name='login_user'),
     path('register/', views.register_user, name='register_user'),
-
+    path('dealers/', dealers, name='dealers'),
     # path for dealer reviews view
     path("dealer/<int:dealer_id>/", dealer_detail, name="dealer_detail"),
 

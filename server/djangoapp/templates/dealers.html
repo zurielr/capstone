@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Dealerships</h1>
+<form method="get" action="">
+    <label for="state">Filter by State:</label>
+    <select name="state" id="state" onchange="this.form.submit()">
+        <option value="" {% if not selected_state %}selected{% endif %} disabled hidden>State</option>
+        <option value="All" {% if selected_state == "All" %}selected{% endif %}>All States</option>
+        {% for state in states %}
+            <option value="{{ state }}" {% if selected_state == state %}selected{% endif %}>{{ state }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>Dealer Name</th>
+        <th>City</th>
+        <th>Address</th>
+        <th>Zip</th>
+        <th>State</th>
+        {% if is_logged_in %}
+            <th>Review Dealer</th>
+        {% endif %}
+    </tr>
+    {% for dealer in dealers_list %}
+    <tr>
+        <td>{{ dealer.id }}</td>
+        <td><a href="{% url 'djangoapp:dealer_detail' dealer.id %}">{{ dealer.full_name }}</a></td>
+        <td>{{ dealer.city }}</td>
+        <td>{{ dealer.address }}</td>
+        <td>{{ dealer.zip }}</td>
+        <td>{{ dealer.state }}</td>
+        {% if is_logged_in %}
+            <td>
+                <a href="{% url 'djangoapp:post_review' dealer.id %}">
+                    <img src="{% static 'reviewicon.png' %}" class="review_icon" alt="Post Review"/>
+                </a>
+            </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,10 @@
+[
+  {
+    "model": "djangoapp.carmake",
+    "pk": 1,
+    "fields": {
+      "name": "DefaultMake",
+      "description": "Default make for fixture"
+    }
+  }
+]
